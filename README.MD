@@ -1,0 +1,1 @@
+打包后需要删除MANIFEST.MF

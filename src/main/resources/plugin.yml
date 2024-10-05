@@ -1,0 +1,21 @@
+name: ChunkDownloader
+version: ${project.version}
+main: org.xjcraft.chunkdownloader.ChunkDownloader
+api-version: 1.13
+depend: [SimpleSpigot]
+
+
+commands:
+  ChunkDownloader:
+    description: Contains all commands in [ChunkDownloader],can be shorted as /cd.
+    usage: use /<command> help to show all commands avaliable in plugin
+    permission: chunk.command
+    permission-message: You don't have <permission>
+    aliases:
+      - cd
+
+
+permissions:
+  chunk.command:
+    description: Allow user to use chunk download command
+    default: true
