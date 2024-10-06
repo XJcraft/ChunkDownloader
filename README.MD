@@ -1,1 +1,4 @@
-打包后需要删除MANIFEST.MF
+用来供普通玩家查询与下载onedrive地图备份的插件
+
+打包后需要手工删除MANIFEST.MF
+
