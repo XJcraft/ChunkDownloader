@@ -37,6 +37,16 @@ public class CDCommand implements CommonCommandExecutor {
         plugin.getServer().getScheduler().runTaskAsynchronously(plugin, new Runnable() {
             @Override
             public void run() {
+                if (AzureConfig.config.getShareMethod() == AzureConfig.ShareMethod.FTP) {
+                    String url = FtpUtil.buildUrl(path);
+                    plugin.getServer().getScheduler().runTask(plugin, () ->
+                        plugin.getServer().dispatchCommand(plugin.getServer().getConsoleSender(),
+                                String.format("tellraw %s [\"\",{\"text\":\"点此下载我所在的区块\",\"color\":\"blue\",\"bold\":false,\"underlined\":true,\"clickEvent\":{\"action\":\"open_url\",\"value\":\"%s\"}}]",
+                                        player.getName(), url))
+                    );
+                    return;
+                }
+
                 String url = OneDriveUtil.getFileDownloadUrl(path);
                 plugin.getServer().getScheduler().runTask(plugin, () -> {
                     plugin.getServer().dispatchCommand(plugin.getServer().getConsoleSender(),
