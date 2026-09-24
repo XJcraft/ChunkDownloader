@@ -70,4 +70,13 @@ public class FtpUtilTest {
             FtpUtil.buildUrl("map/r.1.1.mca")
         );
     }
+
+    @Test
+    public void spaceInPasswordBecomesPercent20() {
+        AzureConfig.config.setFtpPassword("pa ss");
+        assertEquals(
+            "ftp://reader:pa%20ss@ftp.example.com:21/map/r.1.1.mca",
+            FtpUtil.buildUrl("map/r.1.1.mca")
+        );
+    }
 }
