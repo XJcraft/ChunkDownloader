@@ -41,7 +41,7 @@ public class CDCommand implements CommonCommandExecutor {
                     String url = FtpUtil.buildUrl(path);
                     plugin.getServer().getScheduler().runTask(plugin, () ->
                         plugin.getServer().dispatchCommand(plugin.getServer().getConsoleSender(),
-                                String.format("tellraw %s [\"\",{\"text\":\"点此下载我所在的区块\",\"color\":\"blue\",\"bold\":false,\"underlined\":true,\"clickEvent\":{\"action\":\"open_url\",\"value\":\"%s\"}}]",
+                                String.format("tellraw %s [\"\",{\"text\":\"点此复制FTP下载地址\",\"color\":\"green\",\"bold\":false,\"underlined\":true,\"clickEvent\":{\"action\":\"copy_to_clipboard\",\"value\":\"%s\"}}]",
                                         player.getName(), url))
                     );
                     return;
