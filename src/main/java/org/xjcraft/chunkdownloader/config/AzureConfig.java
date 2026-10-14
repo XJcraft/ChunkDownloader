@@ -10,7 +10,7 @@ import java.util.Map;
 @Data
 @RConfig(configName = "azure.yml")
 public class AzureConfig {
-    public enum ShareMethod { ONEDRIVE, FTP }
+    public enum ShareMethod {ONEDRIVE, FTP, HTTP}
 
     @Instance
     public static AzureConfig config = new AzureConfig();

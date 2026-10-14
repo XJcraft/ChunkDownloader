@@ -1,12 +1,12 @@
 package org.xjcraft.chunkdownloader;
 
-import org.apache.commons.math3.util.Pair;
 import org.bukkit.Chunk;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.xjcraft.annotation.RCommand;
 import org.xjcraft.api.CommonCommandExecutor;
 import org.xjcraft.chunkdownloader.config.AzureConfig;
+import org.xjcraft.chunkdownloader.config.HttpConfig;
 import org.xjcraft.utils.StringUtil;
 
 import java.util.HashMap;
@@ -26,22 +26,41 @@ public class CDCommand implements CommonCommandExecutor {
             put("x", (chunk.getX() >> 5) + "");
             put("y", (chunk.getZ() >> 5) + "");
         }};
-        String fname = StringUtil.applyPlaceHolder(AzureConfig.config.getFname(), placeholder);
-        String p = AzureConfig.config.getWorlds().getOrDefault(chunk.getWorld().getName(), chunk.getWorld().getName());
-        final String path = String.format(p, fname);
-        System.out.println("get url for: " + path);
+        String worldName = chunk.getWorld().getName();
 
-        plugin.getServer().dispatchCommand(plugin.getServer().getConsoleSender(),
-                String.format("tellraw %s [\"\",{\"text\":\"正在查询文件：%s\",\"color\":\"white\"}]",
-                        player.getName(), fname));
         plugin.getServer().getScheduler().runTaskAsynchronously(plugin, new Runnable() {
             @Override
             public void run() {
+                if (AzureConfig.config.getShareMethod() == AzureConfig.ShareMethod.HTTP) {
+                    String fname = StringUtil.applyPlaceHolder(HttpConfig.config.getFname(), placeholder);
+                    String p = HttpConfig.config.getWorlds().getOrDefault(worldName, worldName);
+                    String path = String.format(p, fname);
+                    System.out.println("get url for: " + path);
+
+                    String url = HttpUtil.buildUrl(path);
+                    plugin.getServer().getScheduler().runTask(plugin, () ->
+                            plugin.getServer().dispatchCommand(plugin.getServer().getConsoleSender(),
+                                    String.format("tellraw %s [\"\",{\"text\":\"点此下载我所在的区块\",\"color\":\"blue\",\"bold\":false,\"underlined\":true,\"click_event\":{\"action\":\"open_url\",\"url\":\"%s\"}}]",
+                                            player.getName(), url))
+                    );
+                    return;
+                }
+
+                String fname = StringUtil.applyPlaceHolder(AzureConfig.config.getFname(), placeholder);
+                String p = AzureConfig.config.getWorlds().getOrDefault(worldName, worldName);
+                final String path = String.format(p, fname);
+                System.out.println("get url for: " + path);
+
+                plugin.getServer().getScheduler().runTask(plugin, () ->
+                        plugin.getServer().dispatchCommand(plugin.getServer().getConsoleSender(),
+                                String.format("tellraw %s [\"\",{\"text\":\"正在查询文件：%s\",\"color\":\"white\"}]",
+                                        player.getName(), fname)));
+
                 if (AzureConfig.config.getShareMethod() == AzureConfig.ShareMethod.FTP) {
                     String url = FtpUtil.buildUrl(path);
                     plugin.getServer().getScheduler().runTask(plugin, () ->
                         plugin.getServer().dispatchCommand(plugin.getServer().getConsoleSender(),
-                                String.format("tellraw %s [\"\",{\"text\":\"点此复制FTP下载地址\",\"color\":\"green\",\"bold\":false,\"underlined\":true,\"clickEvent\":{\"action\":\"copy_to_clipboard\",\"value\":\"%s\"}}]",
+                                String.format("tellraw %s [\"\",{\"text\":\"点此复制FTP下载地址\",\"color\":\"green\",\"bold\":false,\"underlined\":true,\"click_event\":{\"action\":\"copy_to_clipboard\",\"value\":\"%s\"}}]",
                                         player.getName(), url))
                     );
                     return;
@@ -50,7 +69,7 @@ public class CDCommand implements CommonCommandExecutor {
                 String url = OneDriveUtil.getFileDownloadUrl(path);
                 plugin.getServer().getScheduler().runTask(plugin, () -> {
                     plugin.getServer().dispatchCommand(plugin.getServer().getConsoleSender(),
-                            String.format("tellraw %s [\"\",{\"text\":\"点此下载我所在的区块\",\"color\":\"blue\",\"bold\":false,\"underlined\":true,\"clickEvent\":{\"action\":\"open_url\",\"value\":\"%s\"}}]",
+                            String.format("tellraw %s [\"\",{\"text\":\"点此下载我所在的区块\",\"color\":\"blue\",\"bold\":false,\"underlined\":true,\"click_event\":{\"action\":\"open_url\",\"url\":\"%s\"}}]",
                                     player.getName(), url));
 
                 });
@@ -63,16 +82,11 @@ public class CDCommand implements CommonCommandExecutor {
                         String time = pair.getTime();
                         String version = pair.getUrl();
                         plugin.getServer().dispatchCommand(plugin.getServer().getConsoleSender(),
-                                String.format("tellraw %s [\"\",{\"text\":\"%s\",\"color\":\"blue\",\"bold\":false,\"underlined\":true,\"clickEvent\":{\"action\":\"open_url\",\"value\":\"%s\"}}]",
+                                String.format("tellraw %s [\"\",{\"text\":\"%s\",\"color\":\"blue\",\"bold\":false,\"underlined\":true,\"click_event\":{\"action\":\"open_url\",\"url\":\"%s\"}}]",
                                         player.getName(),time, version));
                     }
                 });
             }
         });
-
-
-
-
-
     }
 }
