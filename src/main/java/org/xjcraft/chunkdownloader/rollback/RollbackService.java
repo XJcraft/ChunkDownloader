@@ -54,6 +54,37 @@ public class RollbackService {
         return AzureConfig.config.getRollbackWorlds().get(worldName);
     }
 
+    /**
+     * 本地 region 目录。新版世界格式把维度放在 dimensions/minecraft/&lt;维度&gt;/region，
+     * 旧格式是 region / DIM-1 / DIM1。两种布局并存，按存在性探测。
+     * getWorldFolder() 可能是相对路径（相对服务器工作目录），统一转绝对路径。
+     */
+    private static File resolveRegionDir(World world) {
+        for (File dir : regionDirs(world)) {
+            if (dir.isDirectory()) {
+                return dir;
+            }
+        }
+        return null;
+    }
+
+    private static List<File> regionDirs(World world) {
+        File root = world.getWorldFolder().getAbsoluteFile();
+        List<File> dirs = new ArrayList<File>();
+        World.Environment env = world.getEnvironment();
+        if (env == World.Environment.NETHER) {
+            dirs.add(new File(root, "dimensions/minecraft/the_nether/region"));
+            dirs.add(new File(root, "DIM-1/region"));
+        } else if (env == World.Environment.THE_END) {
+            dirs.add(new File(root, "dimensions/minecraft/the_end/region"));
+            dirs.add(new File(root, "DIM1/region"));
+        } else {
+            dirs.add(new File(root, "dimensions/minecraft/overworld/region"));
+            dirs.add(new File(root, "region"));
+        }
+        return dirs;
+    }
+
     /** 阶段 A-1：列出历史版本。回调在主线程执行。 */
     public void listVersions(final String ownerId, final String worldName,
                              final int regionX, final int regionZ,
@@ -148,7 +179,13 @@ public class RollbackService {
             callback.done(null, "已有回滚正在进行");
             return;
         }
-        final File regionFile = new File(new File(world.getWorldFolder(), "region"),
+        final File regionDir = resolveRegionDir(world);
+        if (regionDir == null) {
+            inProgress.set(false);
+            callback.done(null, "找不到本地 region 目录，尝试过: " + regionDirs(world));
+            return;
+        }
+        final File regionFile = new File(regionDir,
                 RegionPaths.regionFileName(regionX, regionZ));
         if (!regionFile.isFile()) {
             inProgress.set(false);
