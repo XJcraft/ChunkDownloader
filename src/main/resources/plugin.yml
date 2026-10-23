@@ -19,3 +19,6 @@ permissions:
   chunk.command:
     description: Allow user to use chunk download command
     default: true
+  chunk.rollback:
+    description: Allow OP to hot-rollback a region file from FTPS backups
+    default: op

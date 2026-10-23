@@ -1,19 +1,28 @@
 package org.xjcraft.chunkdownloader;
 
-import org.bukkit.plugin.java.JavaPlugin;
 import org.xjcraft.CommonPlugin;
+import org.xjcraft.chunkdownloader.rollback.RollbackLoginGuard;
+import org.xjcraft.chunkdownloader.rollback.RollbackService;
 
 public final class ChunkDownloader extends CommonPlugin {
 
+    private RollbackService rollbackService;
+
     @Override
     public void onEnable() {
-        // Plugin startup logic
         loadConfigs();
-        registerCommand(new CDCommand(this));
+        rollbackService = new RollbackService(this);
+        rollbackService.startupCleanup();
+        registerCommand(new CDCommand(this, rollbackService));
+        getServer().getPluginManager()
+                .registerEvents(new RollbackLoginGuard(rollbackService), this);
     }
 
     @Override
     public void onDisable() {
-        // Plugin shutdown logic
+    }
+
+    public RollbackService getRollbackService() {
+        return rollbackService;
     }
 }

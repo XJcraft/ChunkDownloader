@@ -56,6 +56,15 @@
                                     <pattern>com.fasterxml.jackson</pattern>
                                     <shadedPattern>org.xjcraft.chunkdownloader.com.fasterxml.jackson</shadedPattern>
                                 </relocation>
+                                <!-- commons-net / commons-io 与其它插件撞包会互相覆盖 -->
+                                <relocation>
+                                    <pattern>org.apache.commons.net</pattern>
+                                    <shadedPattern>org.xjcraft.chunkdownloader.commons.net</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>org.apache.commons.io</pattern>
+                                    <shadedPattern>org.xjcraft.chunkdownloader.commons.io</shadedPattern>
+                                </relocation>
                             </relocations>
                         </configuration>
                     </execution>
@@ -139,6 +148,16 @@
             <artifactId>junit</artifactId>
             <version>4.13.2</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>commons-net</groupId>
+            <artifactId>commons-net</artifactId>
+            <version>3.13.0</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>2.20.0</version>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/com.onedrive.sdk/onedrive-sdk-android -->

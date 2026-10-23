@@ -36,4 +36,25 @@ public class AzureConfig {
     // Path prefix on the FTP server. Leave empty when directory layout mirrors OneDrive.
     String ftpRoot = "";
     boolean ftpPassive = true;
+
+    // ---- OP hot rollback ----
+    String ftpRollbackUser = "";
+    String ftpRollbackPassword = "";
+    // 回滚专用主机；留空回退到 ftpHost。内网备份机与分享用的公网地址通常不同
+    String ftpRollbackHost = "";
+    int ftpRollbackPort = 0;
+    // 回滚账号在 FTP 上的根目录；与分享用的 ftpRoot 是两个账号，含义不同，不能共用
+    String ftpRollbackRoot = "";
+    // vsftpd 多用自签证书；仅在内网可信环境打开
+    boolean ftpTrustAllCerts = false;
+    int rollbackTokenTtlSeconds = 300;
+    // teleport: 传送到同世界出生点; kick: 直接断开
+    String rollbackKickMode = "teleport";
+
+    // world 名 -> 该世界 region 文件在 FTP 上的目录（相对 ftpRoot）
+    Map<String, String> rollbackWorlds = new HashMap<String, String>() {{
+        put("MainLand", "MainLand/dimensions/minecraft/overworld/region");
+        put("MainLand_nether", "MainLand_nether/dimensions/minecraft/the_nether/region");
+        put("MainLand_the_end", "MainLand_the_end/dimensions/minecraft/the_end/region");
+    }};
 }
